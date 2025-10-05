@@ -21,7 +21,7 @@ In order to use this code, is it recommended to have Docker installed, as the do
     └── test_<timestamp>  -> A generated test folder.
         └── S<seed>_T<translation>_R<rotation> -> A folder with the assets of an example with a given numpy seed, and a translation and rotation performed to the second point set.
 ├── Dockerfile            -> Dockerfile with the necessary jupyter container commands.
-├── docker-compose.yaml   -> Docker compose file.
+├── docker-compose.yml   -> Docker compose file.
 ├── docker-run.bat        -> Autorun docker for Windows users.
 └── README.md             -> Project information.
 ```
