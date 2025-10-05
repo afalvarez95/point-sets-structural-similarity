@@ -15,7 +15,7 @@ In order to use this code, is it recommended to have Docker installed, as the do
 ## File tree
 
 ```
-.
+point-sets-structural-similarity
 ├── src                   -> Where the code is stored. Includes an example Jupyter notebook to generate tests files.
 ├── tests                 -> Where all the tests are included. Subfolders follow the pattern: test_<timestamp>/<S<seed>_T<translation>_R<rotation>.
     └── test_<timestamp>  -> A generated test folder.
