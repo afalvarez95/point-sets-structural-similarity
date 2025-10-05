@@ -1,0 +1,8 @@
+jupyter
+opencv-python
+pandas
+shapely
+matplotlib
+scikit-image
+ipympl
+numpy==1.26.4
