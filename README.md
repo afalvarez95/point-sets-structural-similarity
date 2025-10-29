@@ -19,7 +19,7 @@ point-sets-structural-similarity
 ├── src                   -> Where the code is stored. Includes an example Jupyter notebook to generate tests files.
 ├── tests                 -> Where all the tests are included. Subfolders follow the pattern: test_<timestamp>/<S<seed>_T<translation>_R<rotation>.
     └── test_<timestamp>  -> A generated test folder.
-        └── S<seed>_T<translation>_R<rotation> -> A folder with the assets of an example with a given numpy seed, and a translation and rotation performed to the second point set.
+        └── S<seed>_T<translation>_R<rotation> -> A folder with the files of an example with a given numpy seed, and a translation and rotation performed to the second point set.
 ├── Dockerfile            -> Dockerfile with the necessary jupyter container commands.
 ├── docker-compose.yml   -> Docker compose file.
 ├── docker-run.bat        -> Autorun docker for Windows users.
