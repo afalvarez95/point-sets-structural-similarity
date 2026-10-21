@@ -1,11 +1,12 @@
 import pandas as pd
 from mci_lib.point_set_generation.point_set_generation import *
 import os
+import argparse
+from config import PFG__DEFAULT_BASE_POINT_CLOUD_FOLDER, PFG__DEFAULT_DATASET_CSV_FILE
 
+DEFAULT_BASE_POINT_CLOUD_FOLDER = PFG__DEFAULT_BASE_POINT_CLOUD_FOLDER
 
-DEFAULT_BASE_POINT_CLOUD_FOLDER = 'perlin_base_point_clouds_debug'
-
-DEFAULT_DATASET_CSV_FILE  = 'perlin_base_dataset_20260920.csv'
+DEFAULT_DATASET_CSV_FILE = PFG__DEFAULT_DATASET_CSV_FILE
 
 def semicolon_list_converter_to_int_list(string: str):
     print(string)
@@ -28,16 +29,13 @@ def semicolon_list_converter_to_float_list(string: str):
 
 #This file is the first step to generate the perlin base images: aka, the images without any rigid transformation.
 #These are generated with the perlin_base_dataset.csv file.
-python_local_path = os.path.dirname(os.path.dirname(__file__))
-perlin_base_dataset_path = os.path.join(python_local_path,'perlin_base_csv_dataset',DEFAULT_DATASET_CSV_FILE)
-rigid_transforms_path = os.path.join(python_local_path,'perlin_base_csv_dataset','rigid_transforms.csv')
-
+perlin_base_dataset_path = DEFAULT_DATASET_CSV_FILE
 
 df_perlin = pd.read_csv(perlin_base_dataset_path).astype(str)
 
-df_rigid_transforms = pd.read_csv(rigid_transforms_path).astype(str)
 
-output_folder = os.path.join(python_local_path,DEFAULT_BASE_POINT_CLOUD_FOLDER)
+output_folder = str(DEFAULT_BASE_POINT_CLOUD_FOLDER)
+os.makedirs(output_folder, exist_ok=True)
 
 unaltered_rigid_transform = RigidTransformation([0,0],0)
 
@@ -45,8 +43,17 @@ unaltered_rigid_transform = RigidTransformation([0,0],0)
 
 width, height = 1000,1000
 
+parser = argparse.ArgumentParser()
 
-for _, row_perlin in df_perlin.iterrows():
+parser.add_argument("-b","--batch-size",type=int,default=24)
+parser.add_argument("-i","--index",type=int,default=0)
+
+args = parser.parse_args()
+
+start = args.index * args.batch_size
+df_batch_perlin = df_perlin.iloc[start:start + args.batch_size]
+
+for _, row_perlin in df_batch_perlin.iterrows():
     name = row_perlin['name']
     perlin_type = PerlinType[row_perlin['perlin_type']]
     perlin_weights = semicolon_list_converter_to_float_list(row_perlin['perlin_weights'])
@@ -54,6 +61,7 @@ for _, row_perlin in df_perlin.iterrows():
     octave_array = semicolon_list_converter_to_int_list(row_perlin['octave_array'])
     t1_point_density = float(row_perlin['t1_point_density'])
     t2_rigid_loss = float(row_perlin['t2_rigid_loss'])
+    numpy_choice_rng_seed = int(row_perlin['numpy_choice_rng_seed'])
 
     print(perlin_type,seed_array,octave_array,perlin_weights)
 
@@ -69,7 +77,8 @@ for _, row_perlin in df_perlin.iterrows():
         unaltered_rigid_transform,
         t1_point_density,
         t2_rigid_loss,
-        csv_name = csv_name
+        csv_name = csv_name,
+        point_sampling_seed=numpy_choice_rng_seed
     )
     print(width,height,
         perlin_func,
@@ -78,7 +87,7 @@ for _, row_perlin in df_perlin.iterrows():
         t1_point_density,
         t2_rigid_loss,
         output_folder+"_".join([name,"T(0,0)_R0"]),
-        0.2
+        numpy_choice_rng_seed
         )
 
     unaltered_dual_perlin_cloud.process_pipeline()

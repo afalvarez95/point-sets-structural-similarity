@@ -16,9 +16,10 @@ import traceback
 
 
 class DatasetType(Enum):
-    PERTURBATION = "Permutation"
+    PERTURBATION = "Perturbation"
     RIGID_TRANSFORMATION = "Rigid_Transformation"
     BOTH = "Both"
+    CROSS_SET = "Cross_Set"
 
 def list_csv_files(perlin_folder):
 
@@ -34,7 +35,7 @@ def read_points_perlin_file(perlin_file):
     T2 = type2_df[['x', 'y']].to_numpy()
     return T1,T2
 
-def generate_perlin_metadata(perlin_file_name,avg_haussdorf_distance_value,p95_haussdorf_distance_value,wass_value,dataset_type):
+def generate_perlin_metadata(perlin_file_name,avg_haussdorf_distance_value,p95_haussdorf_distance_value,haussdorf_distance_value,wass_value,dataset_type):
     
     def translation_string_to_module(translation_str):
         start = translation_str.find('(')
@@ -46,29 +47,34 @@ def generate_perlin_metadata(perlin_file_name,avg_haussdorf_distance_value,p95_h
     metadata = {}
 
 
+    dataset_type = DatasetType(dataset_type)
     match dataset_type:
         case DatasetType.PERTURBATION:
             if(perlin_file_name[-1] == '_'):
-                typename,id_,_,_,_ = perlin_file_name.split('_')
+                typename,_,_,_ = perlin_file_name.split('_')
                 main_seed,epsilon=None,0
             else:
-                typename,id_,_,_,main_seed,_,epsilon = perlin_file_name.split('_')
-            metadata['seed'] = typename+'_'+id_
+                print(perlin_file_name)
+                typename,_,_,main_seed,_,epsilon = perlin_file_name.split('_')
+            metadata['seed'] = typename
             metadata['perturbation_seed'] = main_seed
             metadata['epsilon'] = epsilon
             metadata['avg_haussdorf_distance_value'] = avg_haussdorf_distance_value
             metadata['p95_haussdorf_distance_value'] = p95_haussdorf_distance_value
+            metadata['haussdorf_distance_value'] = haussdorf_distance_value
             metadata['wasserstein'] = wass_value
         case DatasetType.RIGID_TRANSFORMATION:
             if(perlin_file_name[-1] == '_'):
-                typename,id_,tr,rot,_ = perlin_file_name.split('_')
+                #typename,id_,tr,rot,_ = perlin_file_name.split('_')
+                typename,tr,rot,_ = perlin_file_name.split('_')
             else:
-                typename,id_,tr,rot = perlin_file_name.split('_')
-            metadata['seed'] = typename+'_'+id_
+                typename,tr,rot = perlin_file_name.split('_')
+            metadata['seed'] = typename
             metadata['translation'] = tr
             metadata['rotation'] = rot+'_center'
             metadata['avg_haussdorf_distance_value'] = avg_haussdorf_distance_value
             metadata['p95_haussdorf_distance_value'] = p95_haussdorf_distance_value
+            metadata['haussdorf_distance_value'] = haussdorf_distance_value
             metadata['wasserstein'] = wass_value
         case DatasetType.BOTH:
             if(perlin_file_name[-1] == '_'):
@@ -82,6 +88,21 @@ def generate_perlin_metadata(perlin_file_name,avg_haussdorf_distance_value,p95_h
             metadata['epsilon'] = epsilon
             metadata['avg_haussdorf_distance_value'] = avg_haussdorf_distance_value
             metadata['p95_haussdorf_distance_value'] = p95_haussdorf_distance_value
+            metadata['haussdorf_distance_value'] = haussdorf_distance_value
+            metadata['wasserstein'] = wass_value
+        case DatasetType.CROSS_SET:
+            if 'x' in perlin_file_name:
+                id_,tr,rot,_ = perlin_file_name.split('_')
+                metadata['seed'] = id_
+            else:
+                typename,id_,tr,rot,_ = perlin_file_name.split('_')
+                metadata['seed'] = typename+'_'+id_
+
+            metadata['translation'] = tr
+            metadata['rotation'] = rot+'_center'
+            metadata['avg_haussdorf_distance_value'] = avg_haussdorf_distance_value
+            metadata['p95_haussdorf_distance_value'] = p95_haussdorf_distance_value
+            metadata['haussdorf_distance_value'] = haussdorf_distance_value
             metadata['wasserstein'] = wass_value
     return metadata
 
@@ -99,9 +120,9 @@ def generate_mcitests_perlin(perlin_folder,begin,end,radius_list,dataset_type):
     for file in list_perlin:
         T1,T2 = read_points_perlin_file(file)
         csv_name = file.stem
-        average_haussdorf_dist, p95_haussdorf_distance = calculate_haussdorf_distances(file)
+        average_haussdorf_dist, p95_haussdorf_distance, haussdorf_distance = calculate_haussdorf_distances(file)
         sliced_wasserstein_dist = calculate_wasserstein(file)[2]
-        perlin_metadata = generate_perlin_metadata(csv_name,average_haussdorf_dist,p95_haussdorf_distance,sliced_wasserstein_dist,dataset_type)
+        perlin_metadata = generate_perlin_metadata(csv_name,average_haussdorf_dist,p95_haussdorf_distance,haussdorf_distance,sliced_wasserstein_dist,dataset_type)
 
         mci_test = MCITestFamily(A_points=T1,
                           B_points=T2,

@@ -80,12 +80,13 @@ class RigidTransform:
     
 
 class PerturbationTransform:
-    def __init__(self, epsilon: float, main_seed: int):
+    def __init__(self, epsilon: float, main_seed: int=None):
         '''
         Initializes a Perturbation Transformation.
         :param epsilon: weight of unitary vector of the perturbation.
         :param : 
         '''
+
         self.epsilon: float = epsilon
         self.main_seed: int = main_seed
     def get_params(self):
@@ -127,7 +128,7 @@ class PointSets:
         :rigid_transform: The rigid transformation performed on point set 2, defaults to None (so no transformation is done)
         :B_prop: The proportion of points that will be deleted on point set 2. Defaults to None (so no elimination).
         :test_name: Custom name of test, in case the points are loaded and there is no seed.
-        :metadata_override: In case of adding custom metadata. Iou_r and mci will be appended on the end.
+        :metadata_override: In case of adding custom metadata. Jd_r and mci will be appended on the end.
 
         ## Random point sets options
         In case of using random points, you have to select **are_randomly_generated** to True.
@@ -265,6 +266,7 @@ class PointSets:
         A = self.res_closings_A
         B = self.res_closings_B
         self.ious = list(map(iou_A_B, A,B))
+        self.jds = [1 - iou for iou in self.ious]
 
     def get_ious(self) -> List[float]:
         '''
@@ -272,16 +274,23 @@ class PointSets:
         '''
         return self.ious
 
-    def plot_iou_per_radius(self,base_folder_name: str='example',show_plot=False):    
+    def get_jds(self) -> List[float]:
+        '''
+        :returns: The list of J_delta (1 - IoU, Jaccard distance) per radius.
+        '''
+        return self.jds
+
+    def plot_jd_per_radius(self,base_folder_name: str='example',show_plot=False):
         plt.clf()
         X = self.get_radii()
-        Y = self.get_ious()
-        plt.plot(X, Y, marker='o', linestyle='-')
+        Y = self.get_jds()
+        plt.plot(X, Y, marker='o', linestyle='-', clip_on=False)
         plt.fill_between(X, Y, color='red', alpha=0.3)
+        plt.ylim(0, 1)
         plt.xlabel('Radius')
-        plt.ylabel('IoU')
-        plt.title(self.test_name+'\nIoU per radius (AUC in red)')
-        plt.savefig(Path(base_folder_name) / (self.test_name+'_iou_per_r_plot.png'),dpi=300)
+        plt.ylabel(r'$J_\delta$')
+        plt.title(self.test_name+'\n'+r'$J_\delta$ per radius (AUC in red)')
+        plt.savefig(Path(base_folder_name) / (self.test_name+'_jd_per_r_plot.png'),dpi=300)
         if(show_plot):
             plt.show()
 
@@ -291,11 +300,11 @@ class PointSets:
         '''
         Calculates and stores in the object the area under the curve.
         '''
-        self.auc = np.trapz(self.get_ious(), self.get_radii())
+        self.auc = np.trapz(self.get_jds(), self.get_radii())
 
     def calculate_mci(self) -> float:
         '''
-        :returns: The MCI of the point sets.
+        :returns: The MCI of the point sets: the area under J_delta normalized by the radius range (0 when aligned).
         '''
         self.mci = self.auc / (max(self.get_radii()) - min(self.get_radii()))
         return self.mci
@@ -335,22 +344,23 @@ class PointSets:
         '''
         Generates all the files for that point set incremental closing and stores all the measurements in a given csv file.
         '''
+        print(f"Before calculate closings, the name is: {video_file_name} {csv_file_path}")
         self.calculate_closings()
         self.plot_closing_animations(base_folder = base_folder_name,output_file_name=video_file_name,display_vid=show_files)
         self.calculate_iou_per_radius()
-        self.plot_iou_per_radius(base_folder_name,show_files)
+        self.plot_jd_per_radius(base_folder_name,show_files)
         self.calculate_auc()
         self.calculate_mci()
-        iou_r_str =  ';'.join(f'({r},{iou})' for r, iou in zip(self.radius_list,self.ious))
+        jd_r_str =  ';'.join(f'({r},{jd})' for r, jd in zip(self.radius_list,self.jds))
         print(self.__str__().split("_"))
         
         if(self.metadata_override is not None):
                 data = self.metadata_override
                 data['mci'] = self.mci
-                data['iou_r'] = iou_r_str
+                data['jd_r'] = jd_r_str
         else:
             seed,t,r,timestamp = self.__str__().split("_")
-            data = {'seed': seed[1:], 'translation':t[1:],'rotation':r[1:],'timestamp':timestamp[4:],'mci': self.mci, 'iou_r': iou_r_str}
+            data = {'seed': seed[1:], 'translation':t[1:],'rotation':r[1:],'timestamp':timestamp[4:],'mci': self.mci, 'jd_r': jd_r_str}
         with open(csv_file_path, 'a') as f:
 
             df = pd.DataFrame([data])
@@ -436,7 +446,8 @@ class MCITestFamily:
             csv_file_path : Path = Path.cwd() / output_folder_name / paths[0].parent / Path(csv_filename+'.csv')
         
 
-        names = [str(ps) for ps in self.pss]
+        #The video is named after the point set (test_name), random point sets without name keep the seed and timestamp name.
+        names = [ps.test_name if ps.test_name is not None else str(ps) for ps in self.pss]
         for ps, path, name in zip(self.pss, paths, names): 
             if output_folder_name is None:
                 ps.generate_files(Path.cwd() / 'tests' / path, name + '.mp4',csv_file_path,show_output)

@@ -8,7 +8,7 @@ def summarize_nn_distances_from_file(df, total_stats,filename):
     df = df.replace(np.inf, np.nan)
     stats_list = []
 
-    for column in ['t1_min_dist_arr', 't2_min_dist_arr', 'cross_min_dist_arr']:
+    for column in ['t1_min_dist_arr', 't2_min_dist_arr', 'cross_min_dist_arr','t1_min_dist_arr_2nn', 't2_min_dist_arr_2nn', 'cross_min_dist_arr_2nn']:
         
         mode_bins = pd.cut(df[column], bins=np.arange(0, 1415, 5))
         mode = mode_bins.value_counts().idxmax()
@@ -27,6 +27,7 @@ def summarize_nn_distances_from_file(df, total_stats,filename):
         mean = df[column].mean()
         std_dev = df[column].std()
         quantile_95 = df[column].quantile(0.95)
+        quantile_05 = df[column].quantile(0.05)
         stats_list.append({
             'File': filename.replace(',',"#"),
             'Column': column,
@@ -36,6 +37,7 @@ def summarize_nn_distances_from_file(df, total_stats,filename):
             'Median': median,
             'Mean': mean,
             'Std Dev': std_dev,
+            '5th Percentile': quantile_05,
             '95th Percentile': quantile_95
         })
 
@@ -71,13 +73,20 @@ def summarize_nn_distances_from_folder(input_directory,output_directory,stats_fi
 def offer_radius_ranges_recommendation(input_directory,stats_file_name='statistics_all_files.csv'):
     statistics_file = os.path.join(input_directory, stats_file_name)
     df_stats = pd.read_csv(statistics_file)
-    t1_name,t2_name = 't1_min_dist_arr','t2_min_dist_arr'
-    t1_and_t2_names = [t1_name,t2_name]
-    t1_or_t2_df = df_stats.loc[df_stats['Column'].isin(t1_and_t2_names)]
-    t1_df = df_stats[df_stats['Column'] == t1_name]
-    t2_df = df_stats[df_stats['Column'] == t2_name]
-    min_raw_mode = t1_or_t2_df['Raw Mode (int)'].min()
-    _75th_percentile_of_95th_percentile_t1 = math.ceil(t1_df['95th Percentile'].quantile(0.75))
-    _75th_percentile_of_95th_percentile_t2 = math.ceil(t2_df['95th Percentile'].quantile(0.75))
-    maximum_radius = max(_75th_percentile_of_95th_percentile_t1,_75th_percentile_of_95th_percentile_t2)
-    print(f"Recommended radius range is: minimum radius={min_raw_mode}, maximum radius={maximum_radius}")
+    t1_name_1nn,t2_name_1nn = 't1_min_dist_arr','t2_min_dist_arr'
+    t1_and_t2_names_1nn = [t1_name_1nn,t2_name_1nn]
+    t1_or_t2_df_1nn = df_stats.loc[df_stats['Column'].isin(t1_and_t2_names_1nn)]
+
+
+    t1_name_2nn,t2_name_2nn = 't1_min_dist_arr_2nn','t2_min_dist_arr_2nn'
+    t1_and_t2_names_2nn = [t1_name_2nn,t2_name_2nn]
+    t1_or_t2_df_2nn = df_stats.loc[df_stats['Column'].isin(t1_and_t2_names_2nn)]
+
+    max_5th_percentile_2nn_t1_or_t2 = t1_or_t2_df_2nn['5th Percentile'].max()
+
+    max_95th_percentile_1nn_t1_or_t2 = t1_or_t2_df_2nn['95th Percentile'].max()
+
+    min_radius = math.ceil(max_5th_percentile_2nn_t1_or_t2 / 4) * 4
+    max_radius = math.ceil(max_95th_percentile_1nn_t1_or_t2 / 4) * 4
+
+    print(f"Recommended radius range is: minimum radius={min_radius}, maximum radius={max_radius}")

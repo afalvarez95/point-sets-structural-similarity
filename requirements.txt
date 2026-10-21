@@ -1,9 +1,13 @@
 jupyter
 opencv-python
 pandas
-shapely
+shapely==2.1.0
 matplotlib
 scikit-image
 ipympl
-numpy==1.26.4
+pot
+seaborn
 gradio
+numpy==1.26.4
+ipyparallel
+perlin-noise

@@ -38,30 +38,40 @@ def calculate_nearest_neighbour_distance_distribution_from_file(current_csv_file
     t2_min_dist_arr = np.full(len(df_filtered), np.inf)
     cross_min_dist_arr = np.full(len(df_filtered), np.inf)
 
+    t1_min_dist_arr_2nn = np.full(len(df_filtered), np.inf)
+    t2_min_dist_arr_2nn = np.full(len(df_filtered), np.inf)
+    cross_min_dist_arr_2nn = np.full(len(df_filtered), np.inf)
+
     for i in range(len(df_filtered)):
         x, y, case_type = coords[i][0], coords[i][1], cases[i]
         
-        if i < len(df_filtered) - 1:
-            future_coords = coords[i + 1:]
-            future_cases = cases[i + 1:]
+        other_coords = np.delete(coords, i, axis=0)
+        other_cases = np.delete(cases, i, axis=0)
 
-            distances = np.linalg.norm(future_coords - np.array([x, y]), axis=1)
+        distances = np.linalg.norm(other_coords - np.array([x, y]), axis=1)
 
-            if(case_type == 'Type 1'):
-                t1_mask = (future_cases == 'Type 1')
-                t1_min_dist_arr[i] = np.min(distances[t1_mask], initial=np.inf)
+        if(case_type == 'Type 1'):
+            t1_mask = (other_cases == 'Type 1')
+            t1_min_dist_arr[i] = np.min(distances[t1_mask], initial=np.inf)
+            t1_min_dist_arr_2nn[i] = np.partition(distances[t1_mask], 1)[1] if distances[t1_mask].size >= 2 else np.inf
 
-            if(case_type == 'Type 2'):
-                t2_mask = (future_cases == 'Type 2')
-                t2_min_dist_arr[i] = np.min(distances[t2_mask], initial=np.inf)
+        if(case_type == 'Type 2'):
+            t2_mask = (other_cases == 'Type 2')
+            t2_min_dist_arr[i] = np.min(distances[t2_mask], initial=np.inf)
+            t2_min_dist_arr_2nn[i] = np.partition(distances[t2_mask], 1)[1] if distances[t2_mask].size >= 2 else np.inf
 
-            cross_mask = (future_cases != case_type)
-            cross_min_dist_arr[i] = np.min(distances[cross_mask], initial=np.inf)
+        cross_mask = (other_cases != case_type)
+        cross_min_dist_arr[i] = np.min(distances[cross_mask], initial=np.inf)
+        cross_min_dist_arr_2nn[i] = np.partition(distances[cross_mask], 1)[1] if distances[cross_mask].size >= 2 else np.inf
     result_csv = pd.DataFrame({
         'number_id': range(1, len(t1_min_dist_arr) + 1),
         't1_min_dist_arr': t1_min_dist_arr,
         't2_min_dist_arr': t2_min_dist_arr,
-        'cross_min_dist_arr': cross_min_dist_arr
+        'cross_min_dist_arr': cross_min_dist_arr,
+        't1_min_dist_arr_2nn': t1_min_dist_arr_2nn,
+        't2_min_dist_arr_2nn': t2_min_dist_arr_2nn,
+        'cross_min_dist_arr_2nn': cross_min_dist_arr_2nn,
+        
     })
     
     result_csv.to_csv(os.path.join(output_folder,filename), index=False)

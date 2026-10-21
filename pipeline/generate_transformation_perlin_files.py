@@ -4,15 +4,22 @@ import pandas as pd
 import shutil
 #This file is the second step to generate the files which are the perlin clouds after a series of rigid transformation.
 #These are performed with the rigid_transforms.csv file.
+from config import GTPF__DEFAULT_BASE_POINT_CLOUD_FOLDER, GTPF__DESTINATION_TRANSFORMED_POINT_CLOUD_FOLDER, GTPF__OPTION, PERLIN_BASE_CSV_DATASET_DIR
 
 
-DEFAULT_BASE_POINT_CLOUD_FOLDER = 'perlin_base_point_clouds'
 
-DESTINATION_TRANSFORMED_POINT_CLOUD_FOLDER = 'perlin_transformed_point_clouds'
-option = "Translation_Rotation"
+DEFAULT_BASE_POINT_CLOUD_FOLDER = GTPF__DEFAULT_BASE_POINT_CLOUD_FOLDER
 
-python_local_path = os.path.dirname(os.path.dirname(__file__))
-perlin_dataset_folder_path = os.path.join(python_local_path,DESTINATION_TRANSFORMED_POINT_CLOUD_FOLDER)
+DESTINATION_TRANSFORMED_POINT_CLOUD_FOLDER = GTPF__DESTINATION_TRANSFORMED_POINT_CLOUD_FOLDER
+option = GTPF__OPTION
+
+if option is None:
+    raise SystemExit("Transformation is not applicable: GTPF__OPTION is None in config.py.")
+
+#Rotation and translation are applied together with rigid_transforms.csv, the heatmaps split them afterwards.
+RIGID_OPTIONS = ("Translation_Rotation", "Translation", "Rotation")
+
+perlin_dataset_folder_path = str(DESTINATION_TRANSFORMED_POINT_CLOUD_FOLDER)
 
 os.makedirs(DESTINATION_TRANSFORMED_POINT_CLOUD_FOLDER, exist_ok=True)
 
@@ -24,10 +31,10 @@ for file in os.listdir(DEFAULT_BASE_POINT_CLOUD_FOLDER):
         shutil.copy(ruta_origen, DESTINATION_TRANSFORMED_POINT_CLOUD_FOLDER)
         print(f'Copied base perlin file: {file}')
 
-if(option == "Translation_Rotation"):
-    transforms_path = os.path.join(python_local_path,'perlin_base_csv_dataset','rigid_transforms.csv')
+if(option in RIGID_OPTIONS):
+    transforms_path = os.path.join(PERLIN_BASE_CSV_DATASET_DIR,'rigid_transforms.csv')
 else:
-    transforms_path = os.path.join(python_local_path,'perlin_base_csv_dataset','perturbation_transforms.csv')
+    transforms_path = os.path.join(PERLIN_BASE_CSV_DATASET_DIR,'perturbation_transforms.csv')
 
 
 df_transforms_path = pd.read_csv(transforms_path).astype(str)
@@ -41,7 +48,7 @@ for filename in os.listdir(perlin_dataset_folder_path):
         print(f'Transforming points of: {file_path}, using option: {option}' )
 
         for _, row_tra in df_transforms_path.iterrows():
-            if(option == "Translation_Rotation"):
+            if(option in RIGID_OPTIONS):
                 translation_x = float(row_tra['translation_x'])
                 translation_y = float(row_tra['translation_y'])
                 rotation = float(row_tra['rotation_angle'])

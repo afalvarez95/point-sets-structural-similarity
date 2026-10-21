@@ -207,7 +207,8 @@ class DualPerlinCloud:
                  transformation: Transformation = None,
                  t1_point_density: float = None,
                  t2_rigid_loss: float = None,
-                 csv_name: str = None):
+                 csv_name: str = None,
+                 point_sampling_seed = None):
 
         self.width_im = width_im
         self.height_im = height_im
@@ -218,7 +219,7 @@ class DualPerlinCloud:
 
         self.t1_point_density = t1_point_density
         self.t2_rigid_loss = t2_rigid_loss
-
+        self.point_sampling_seed = point_sampling_seed
 
         self.base_perlin = None
         self.picture = None
@@ -241,21 +242,15 @@ class DualPerlinCloud:
         self.picture = noise_values.reshape(self.height_im, self.width_im)
 
     def generate_threshold(self):
-        min_val,max_val = -1, 1
-        normalized_pic = (self.picture - min_val) / (max_val - min_val)
-
-        scaled_pic = (normalized_pic * 255).astype(np.uint8)
-                                                
-        thresholded_pic = (scaled_pic >= 128).astype(np.uint8) * 255
-
-        binary_image = np.array(thresholded_pic) >= 128 
+        median_thresh = np.median(self.picture)
+        binary_image = self.picture <= median_thresh
         self.black_pixel_coords = np.column_stack(np.where(binary_image))
-
 
     def generate_original_perlin_points(self):
         num_black_pixels = len(self.black_pixel_coords)
         num_samples = math.floor(self.t1_point_density*num_black_pixels)
-        sampled_indices = np.random.choice(num_black_pixels, num_samples, replace=False)
+        numpy_rng = np.random.default_rng(seed=self.point_sampling_seed)
+        sampled_indices = numpy_rng.choice(num_black_pixels, num_samples, replace=False,)
         original_points = self.black_pixel_coords[sampled_indices]
         self.points_data.set_original_points(original_points)
 
@@ -315,6 +310,22 @@ class DualPerlinCloud:
 
         type_1_points_list = type_1_points[['x', 'y']].values
         type_2_points_list = type_2_points[['x', 'y']].values
+        
+
+        self.points_data.set_original_points(type_1_points_list)
+        self.points_data.set_transformed_points(type_2_points_list)
+
+
+
+    def load_cross_perlin_cloud_from_two_files(self,csv_file_1: str,csv_file_2: str):
+        df_ps_1 = pd.read_csv(csv_file_1)
+        df_ps_2 = pd.read_csv(csv_file_2)
+
+        ps1_points = df_ps_1[df_ps_1['Type'] == self.points_data.get_labels()[0]]
+        ps2_points = df_ps_2[df_ps_2['Type'] == self.points_data.get_labels()[0]]
+
+        type_1_points_list = ps1_points[['x', 'y']].values
+        type_2_points_list = ps2_points[['x', 'y']].values
         
 
         self.points_data.set_original_points(type_1_points_list)

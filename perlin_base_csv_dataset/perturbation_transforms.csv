@@ -1,0 +1,5 @@
+name,epsilon,main_seed
+pert1,5,700000
+pert2,10,700001
+pert3,20,700002
+pert4,40,700003

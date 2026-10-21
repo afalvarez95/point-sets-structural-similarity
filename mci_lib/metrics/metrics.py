@@ -45,6 +45,8 @@ def calculate_haussdorf_distances(file):
     Given a dual Perlin cloud csv file, calculates the:
     - Average Haussdorf Distance
     - 95th Percentile Haussdorf Distance
+
+    Note: Orignal points denotes the first point set whilst transfomed is the second point set.
     '''
 
     df = pd.read_csv(file) 
@@ -55,15 +57,19 @@ def calculate_haussdorf_distances(file):
     coordinates_original_points = original_points_df[['x', 'y']].to_numpy(dtype="float32")
     coordinates_transformed_points = transformed_points_df[['x', 'y']].to_numpy(dtype="float32")
 
-    distance_matrix = cdist(coordinates_original_points,coordinates_transformed_points, metric='euclidean')
-
+    distance_matrix = cdist(coordinates_original_points, coordinates_transformed_points, metric='euclidean')
+ 
     min_dist_O_to_T = np.min(distance_matrix, axis=1)
     min_dist_T_to_O = np.min(distance_matrix, axis=0)
-    average_haussdorf_distance = (np.mean(min_dist_O_to_T) + np.mean(min_dist_T_to_O))/2
+ 
+    average_hausdorff_distance = (np.mean(min_dist_O_to_T) + np.mean(min_dist_T_to_O)) / 2
+ 
+    p95_O_to_T = np.percentile(min_dist_O_to_T, 95)
+    p95_T_to_O = np.percentile(min_dist_T_to_O, 95)
+    hausdorff_95th_percentile_distance = max(p95_O_to_T, p95_T_to_O)
+ 
+    hausdorff_distance = max(np.max(min_dist_O_to_T), np.max(min_dist_T_to_O))
+ 
+    return average_hausdorff_distance, hausdorff_95th_percentile_distance, hausdorff_distance
 
-    p95_O_to_T = np.percentile(min_dist_O_to_T,95)
-    p95_T_to_O = np.percentile(min_dist_O_to_T,95)
-    haussdorf_95th_percentile_distance = max(p95_O_to_T, p95_T_to_O)
-
-    return average_haussdorf_distance,haussdorf_95th_percentile_distance
 

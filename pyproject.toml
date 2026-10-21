@@ -3,4 +3,4 @@ name = "mci_lib"
 version = "0.1.0"
 
 [tool.setuptools.packages.find]
-include = ["lib*"]
+include = ["mci_lib*"]

@@ -1,0 +1,9 @@
+name,translation_x,translation_y,rotation_angle,
+t1,5,0,0,0
+t2,10,0,0
+t3,20,0,0
+t4,40,0,0
+r1,0,0,2
+r2,0,0,5
+r3,0,0,7
+r4,0,0,10
