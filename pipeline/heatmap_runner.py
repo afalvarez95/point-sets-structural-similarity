@@ -9,7 +9,8 @@ matplotlib.use('TkAgg')
 from config import HR__HEATMAP_CASES, HR__MCI_FOLDERS, HR__OUTPUT_FOLDER
 
 for option in HR__HEATMAP_CASES:
-    suboption = "1nn"
+    #The maximum radius recommended by the NNDistances step is the P95 of the 2NN distances.
+    suboption = "2nn"
     suboption_title = f"{suboption.upper()}"
 
     HAS_TYPES = option == "rigid"

@@ -84,9 +84,9 @@ def offer_radius_ranges_recommendation(input_directory,stats_file_name='statisti
 
     max_5th_percentile_2nn_t1_or_t2 = t1_or_t2_df_2nn['5th Percentile'].max()
 
-    max_95th_percentile_1nn_t1_or_t2 = t1_or_t2_df_2nn['95th Percentile'].max()
+    max_95th_percentile_2nn_t1_or_t2 = t1_or_t2_df_2nn['95th Percentile'].max()
 
     min_radius = math.ceil(max_5th_percentile_2nn_t1_or_t2 / 4) * 4
-    max_radius = math.ceil(max_95th_percentile_1nn_t1_or_t2 / 4) * 4
+    max_radius = math.ceil(max_95th_percentile_2nn_t1_or_t2 / 4) * 4
 
     print(f"Recommended radius range is: minimum radius={min_radius}, maximum radius={max_radius}")
