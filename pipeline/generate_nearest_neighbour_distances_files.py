@@ -10,6 +10,7 @@ NND__TRANSFORMED_POINT_CLOUD_FOLDER_NAMES__CASE__PERTURBED,
 NND__TRANSFORMED_POINT_CLOUD_FOLDER_NAMES__CASE__PER_REM,
 NND__TRANSFORMED_POINT_CLOUD_FOLDER_NAMES__CASE__ROTATION,
 NND__TRANSFORMED_POINT_CLOUD_FOLDER_NAMES__CASE__TRANSLATION,
+NND__TRANSFORMED_POINT_CLOUD_FOLDER_NAMES__CASE__NOISE,
 
 NND__CURRENT_CASE_IDX,
 NND__SKIP_GENERATION,
@@ -24,7 +25,8 @@ titles = {
     "Perturbed": "Perlin Clouds with Perturbation",
     "Perturbed+Removal": "Perlin Clouds with Removal and Perturbation",
     "Rotation": "Perlin Clouds with Rotation",
-    "Translation": "Perlin Clouds with Translation"
+    "Translation": "Perlin Clouds with Translation",
+    "Impulsive noise": "Perlin Clouds with Impulsive Noise"
 }
 
 
@@ -36,7 +38,8 @@ TRANSFORMED_POINT_CLOUD_FOLDER_NAMES = {
     "Perturbed": NND__TRANSFORMED_POINT_CLOUD_FOLDER_NAMES__CASE__PERTURBED,
     "Perturbed+Removal": NND__TRANSFORMED_POINT_CLOUD_FOLDER_NAMES__CASE__PER_REM,
     "Rotation": NND__TRANSFORMED_POINT_CLOUD_FOLDER_NAMES__CASE__ROTATION,
-    "Translation": NND__TRANSFORMED_POINT_CLOUD_FOLDER_NAMES__CASE__TRANSLATION
+    "Translation": NND__TRANSFORMED_POINT_CLOUD_FOLDER_NAMES__CASE__TRANSLATION,
+    "Impulsive noise": NND__TRANSFORMED_POINT_CLOUD_FOLDER_NAMES__CASE__NOISE
 }
 
 NN_DISTANCES_FOLDER_NAMES = {
@@ -46,6 +49,7 @@ NN_DISTANCES_FOLDER_NAMES = {
     "Perturbed+Removal": f'dataset_nn_distance_metrics_perlin_pert_rem_{DATE}',
     "Rotation": f'dataset_nn_distance_metrics_perlin_rigid_{DATE}',
     "Translation": f'dataset_nn_distance_metrics_perlin_rigid_{DATE}',
+    "Impulsive noise": f'dataset_nn_distance_metrics_perlin_noise_{DATE}',
 }
 
 SUMMARIZED_STATS_FILE_NAMES = {
@@ -55,6 +59,7 @@ SUMMARIZED_STATS_FILE_NAMES = {
     "Perturbed+Removal": f'nndist_stats_perlin_pert_rem_{DATE}',
     "Rotation": f'nndist_stats_perlin_rigid_{DATE}',
     "Translation": f'nndist_stats_perlin_rigid_{DATE}',
+    "Impulsive noise": f'nndist_stats_perlin_noise_{DATE}',
 }
 
 SKIP_GENERATION = NND__SKIP_GENERATION

@@ -4,6 +4,7 @@ import textwrap
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from heatmap_classes import measurement_label
 
 #Saves the matrix of a heatmap next to it, so it can be explored:
 #<heatmap>_matrix.csv with the values, and <heatmap>_matrix.png with the value written on each cell.
@@ -47,7 +48,7 @@ def save_matrix(rows, cols, matrix, output_heatmap, measurement, title, reverse,
     ax.set_ylabel(ylabel)
     #Long titles are wrapped so they fit in narrow matrices.
     ax.set_title(textwrap.fill(title or measurement, width=int(fig.get_figwidth() * 8)))
-    fig.colorbar(im, ax=ax, label=measurement)
+    fig.colorbar(im, ax=ax, label=measurement_label(measurement))
     fig.tight_layout()
 
     output_png = output_heatmap.with_name(f"{stem}_matrix.png")

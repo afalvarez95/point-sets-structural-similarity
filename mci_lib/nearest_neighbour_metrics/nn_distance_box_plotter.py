@@ -12,6 +12,7 @@ filters = {
     "Perturbed+Removal": lambda file: file.str.contains("Per_S", regex=False) & file.str.contains("%", regex=False),
     "Rotation": lambda file: ~file.str.contains("_T(0#0)_R0_", regex=False) & ~file.str.contains("R0.0", regex=False),
     "Translation": lambda file: ~file.str.contains("_T(0#0)_R0_", regex=False) & ~file.str.contains("T(0.0#0.0)", regex=False),
+    "Impulsive noise": lambda file: file.str.contains("_n", regex=False),
 }
 
 titles = {
@@ -20,7 +21,8 @@ titles = {
     "Perturbed": "Perlin Clouds with Perturbation",
     "Perturbed+Removal": "Perlin Clouds with Removal and Perturbation",
     "Rotation": "Perlin Clouds with Rotation",
-    "Translation": "Perlin Clouds with Translation"
+    "Translation": "Perlin Clouds with Translation",
+    "Impulsive noise": "Perlin Clouds with Impulsive Noise"
 }
 
 def apply_file_filter(data,case):

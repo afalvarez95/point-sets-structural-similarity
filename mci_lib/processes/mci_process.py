@@ -20,6 +20,7 @@ class DatasetType(Enum):
     RIGID_TRANSFORMATION = "Rigid_Transformation"
     BOTH = "Both"
     CROSS_SET = "Cross_Set"
+    IMPULSIVE_NOISE = "Impulsive_Noise"
 
 def list_csv_files(perlin_folder):
 
@@ -100,6 +101,17 @@ def generate_perlin_metadata(perlin_file_name,avg_haussdorf_distance_value,p95_h
 
             metadata['translation'] = tr
             metadata['rotation'] = rot+'_center'
+            metadata['avg_haussdorf_distance_value'] = avg_haussdorf_distance_value
+            metadata['p95_haussdorf_distance_value'] = p95_haussdorf_distance_value
+            metadata['haussdorf_distance_value'] = haussdorf_distance_value
+            metadata['wasserstein'] = wass_value
+        case DatasetType.IMPULSIVE_NOISE:
+            #<cloud>_n<count>s<offset>: number of noise points and offset of the seed of the noise
+            typename,noise = perlin_file_name.split('_')
+            noise_points,seed_offset = noise[1:].split('s')
+            metadata['seed'] = typename
+            metadata['noise_points'] = int(noise_points)
+            metadata['noise_seed_offset'] = int(seed_offset)
             metadata['avg_haussdorf_distance_value'] = avg_haussdorf_distance_value
             metadata['p95_haussdorf_distance_value'] = p95_haussdorf_distance_value
             metadata['haussdorf_distance_value'] = haussdorf_distance_value

@@ -7,6 +7,7 @@ import numpy as np
 from pathlib import Path
 from config import MEASURMENTS_CSV_FILENAME
 from heatmap_matrix import save_matrix
+from heatmap_classes import PAPER_FONTSIZE, set_class_ticks, set_paper_title, measurement_label
 
 def read_measurement(csv_path, column):
     with open(csv_path, newline="", encoding="utf-8") as f:
@@ -113,7 +114,7 @@ def main():
 
 
     fig, ax = plt.subplots(
-        figsize=(8, 8),
+        figsize=(9, 8),
         constrained_layout=True
     )
 
@@ -126,25 +127,23 @@ def main():
         vmax=np.nanmax(matrix)
     )
 
-    ax.set_xticks(range(n))
-    ax.set_yticks(range(n))
+    #One label per class of Perlin cloud instead of one per point cloud
+    set_class_ticks(ax, names, "x")
+    set_class_ticks(ax, names, "y")
 
+    ax.set_xlabel("Perlin cloud class", fontsize=PAPER_FONTSIZE["label"])
+    ax.set_ylabel("Perlin cloud class", fontsize=PAPER_FONTSIZE["label"])
 
-    ax.set_xticklabels(names, rotation=270, va="top")
-    ax.set_yticklabels(names)
-
-    ax.set_xlabel("Perlin Point Cloud Name")
-    ax.set_ylabel("Perlin Point Cloud Name")
-
-    ax.set_title(args.title)
+    set_paper_title(ax, args.title)
 
     cbar = fig.colorbar(im, ax=ax)
-    cbar.set_label(args.column)
+    cbar.set_label(measurement_label(args.column), fontsize=PAPER_FONTSIZE["colorbar"])
+    cbar.ax.tick_params(labelsize=PAPER_FONTSIZE["ticks"])
 
     output_dir : Path = Path(__file__).resolve().parent.parent / args.output_folder
     output_dir.mkdir(parents=True, exist_ok= True)
     output_heatmap = output_dir / f"{args.title}.png"
-    fig.savefig(output_heatmap)
+    fig.savefig(output_heatmap, dpi=300)
     save_matrix(names, names, matrix, output_heatmap, args.column, args.title, args.reverse,
                 "Perlin Point Cloud Name", "Perlin Point Cloud Name", vrange=(0, np.nanmax(matrix)))
     plt.show()

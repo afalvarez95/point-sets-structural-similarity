@@ -8,6 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from config import MEASURMENTS_CSV_FILENAME
 from heatmap_matrix import save_matrix
+from heatmap_classes import PAPER_FIGSIZE, style_class_heatmap
 
 
 NO_VALUE = "none"
@@ -98,24 +99,14 @@ def plot(rows, cols, matrix, measurement, title, reverse, vrange, output):
     cmap = plt.get_cmap("RdYlGn_r" if reverse else "RdYlGn").copy()
     cmap.set_bad("lightgray")
 
-    fig, ax = plt.subplots(
-        figsize=(max(6, 0.8 * len(cols) + 4), max(4, 0.4 * len(rows) + 2))
-    )
+    fig, ax = plt.subplots(figsize=PAPER_FIGSIZE)
     im = ax.imshow(np.ma.masked_invalid(matrix), cmap=cmap, aspect="auto", vmin=vrange[0], vmax=vrange[1])
-    ax.axvline(0.5, color="black", linewidth=2) 
-    ax.set_xticks(range(len(cols)))
-    ax.set_xticklabels(cols)
-    ax.set_yticks(range(len(rows)))
-    ax.set_yticklabels(rows)
-    ax.set_xlabel("ε")
-    ax.set_ylabel("Perlin Point Cloud Name")
-    ax.set_title(title)
+    ax.axvline(0.5, color="black", linewidth=2)
 
-    measurement_label = measurement
-
-    fig.colorbar(im, ax=ax, label=measurement_label)
-    fig.tight_layout(pad=2.0, rect=(0, 0.06, 1, 1)) 
-    fig.savefig(output, dpi=200, bbox_inches="tight", pad_inches=0.5)
+    #One label per class of Perlin cloud on the rows, paper font sizes
+    style_class_heatmap(fig, ax, im, rows, cols, title, "ε", measurement)
+    fig.tight_layout()
+    fig.savefig(output, dpi=300, bbox_inches="tight", pad_inches=0.3)
     print(f"Saved {output}")
     save_matrix(rows, cols, matrix, output, measurement, title, reverse, "ε", "Perlin Point Cloud Name", vrange=vrange)
 
@@ -147,7 +138,7 @@ def main():
     for rem in rems:
         rows, cols, matrix = build_matrix(records, rem)
         label = "no removals" if rem == NO_REM else f"rem {rem}%"
-        plot(rows, cols, matrix, args.column, f"{args.title} - {args.column} - {label}",
+        plot(rows, cols, matrix, args.column, f"{args.title} - {label}",
              args.reverse, vrange,
              out_folder / f"{label}.png")
     plt.show()

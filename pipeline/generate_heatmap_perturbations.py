@@ -7,6 +7,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from config import MEASURMENTS_CSV_FILENAME,NO_VALUE
 from heatmap_matrix import save_matrix
+from heatmap_classes import PAPER_FIGSIZE, style_class_heatmap
  
  
 def split_name(name):
@@ -86,27 +87,17 @@ def plot(rows, cols, matrix, measurement, title, reverse,output_folder):
     cmap = plt.get_cmap(cmap_name).copy()
     cmap.set_bad("lightgray")
  
-    fig, ax = plt.subplots(
-        figsize=(max(6, 0.8 * len(cols) + 4), max(4, 0.4 * len(rows) + 2))
-    )
+    fig, ax = plt.subplots(figsize=PAPER_FIGSIZE)
     im = ax.imshow(np.ma.masked_invalid(matrix), cmap=cmap, aspect="auto")
- 
-    ax.set_xticks(range(len(cols)))
-    ax.set_xticklabels(cols)
-    ax.set_yticks(range(len(rows)))
-    ax.set_yticklabels(rows)
-    ax.set_xlabel("ε")
-    ax.set_ylabel("Perlin Point Cloud Name")
-    ax.set_title(title)
 
-    measurement_label = measurement
-    fig.colorbar(im, ax=ax, label=measurement_label)
-    fig.tight_layout(pad=3.0)
+    #One label per class of Perlin cloud on the rows, paper font sizes
+    style_class_heatmap(fig, ax, im, rows, cols, title, "ε", measurement)
+    fig.tight_layout()
 
     output_dir : Path = Path(__file__).resolve().parent.parent / output_folder
     output_dir.mkdir(parents=True, exist_ok= True)
     output_heatmap = output_dir / f"{title}.png"
-    fig.savefig(output_heatmap)
+    fig.savefig(output_heatmap, dpi=300)
     print(f"Saved {output_heatmap}")
     save_matrix(rows, cols, matrix, output_heatmap, measurement, title, reverse, "ε", "Perlin Point Cloud Name")
     plt.show()

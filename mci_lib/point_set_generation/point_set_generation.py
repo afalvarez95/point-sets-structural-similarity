@@ -245,6 +245,8 @@ class DualPerlinCloud:
         median_thresh = np.median(self.picture)
         binary_image = self.picture <= median_thresh
         self.black_pixel_coords = np.column_stack(np.where(binary_image))
+        #Pixels above the median (the inverse of the blobs), where the impulsive noise is placed
+        self.white_pixel_coords = np.column_stack(np.where(~binary_image))
 
     def generate_original_perlin_points(self):
         num_black_pixels = len(self.black_pixel_coords)
@@ -254,6 +256,18 @@ class DualPerlinCloud:
         original_points = self.black_pixel_coords[sampled_indices]
         self.points_data.set_original_points(original_points)
 
+
+    def generate_impulsive_noise_points(self, seed, counts):
+        '''
+        Impulsive noise: points on the white pixels of the field (above the median), drawn with their own generator.
+        The largest count is drawn once and each count takes its first points, so every count adds points to the smaller ones.
+        :param seed: Seed of the generator, numpy_choice_rng_seed of the cloud + an offset (not 0, the seed of the blobs).
+        :param counts: Numbers of noise points, e.g. [25, 50, 75, 100].
+        :returns: A dict with the noise points of each count.
+        '''
+        numpy_rng = np.random.default_rng(seed=seed)
+        noise_indices = numpy_rng.choice(len(self.white_pixel_coords), max(counts), replace=False)
+        return {count: self.white_pixel_coords[noise_indices[:count]] for count in counts}
 
     def generate_transformed_perlin_points(self):
         transformed_points = self.transformation(self.points_data.points_f1,self.t2_rigid_loss)

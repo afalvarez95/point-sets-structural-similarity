@@ -8,6 +8,7 @@ class DATASET_CONFIG_OPTIONS(Enum):
     TRANSLATION = auto()
     ROTATION = auto()
     PERT_AND_REMOVAL = auto()
+    IMPULSIVE_NOISE = auto()
 
 class PIPELINE_CONFIG_OPTIONS(Enum):
     MCI_AND_HEATMAPS = auto() #Partial test: point sets are read from input_datasets/<dataset>/*.csv (in the repo), only MCI, NND and heatmaps are run.
@@ -31,6 +32,12 @@ MCIHELP__N_BATCHES = 10
 MCIHELP__MIN_RADIUS = 8
 MCIHELP__MAX_RADIUS = 24
 MCIHELP__RADIUS_STEP = 4
+
+#Impulsive noise options (IMPULSIVE_NOISE): noise points on the white pixels (above the median) of each base cloud
+NOISE__COUNTS = [25, 50, 75, 100]
+#One noise variation per offset: generator seed = numpy_choice_rng_seed of the cloud (perlin_base_dataset.csv) + offset.
+#The offset 0 is not used, it is the seed of the blobs. Changing the offsets gives other reproducible variations.
+NOISE__SEED_OFFSETS = [1, 2, 3, 4]
 
 
 #############################
@@ -61,6 +68,7 @@ DATASET_OPTIONS_SHORT_NAMES = {
     DATASET_CONFIG_OPTIONS.TRANSLATION: "TRA",
     DATASET_CONFIG_OPTIONS.ROTATION: "ROT",
     DATASET_CONFIG_OPTIONS.PERT_AND_REMOVAL: "PER_REM",
+    DATASET_CONFIG_OPTIONS.IMPULSIVE_NOISE: "IN",
 }
 RUN_NAME = f"{DATEIDENTIFIER}_{PIPELINE_OPTIONS_SHORT_NAMES[PIPELINE_OPTIONS]}_{DATASET_OPTIONS_SHORT_NAMES[SELECTED_DATASET_OPTION]}"
 WORK_DIR = PIPELINE_TESTS_DIR / RUN_NAME
@@ -73,6 +81,7 @@ INPUT_DATASET_FOLDER_NAMES = {
     DATASET_CONFIG_OPTIONS.TRANSLATION: "rigid",
     DATASET_CONFIG_OPTIONS.ROTATION: "rigid",
     DATASET_CONFIG_OPTIONS.PERT_AND_REMOVAL: "pert_and_removal",
+    DATASET_CONFIG_OPTIONS.IMPULSIVE_NOISE: "impulsive_noise",
 }
 
 #Point cloud folders generated inside WORK_DIR by steps 1 and 2.
@@ -83,6 +92,8 @@ PERTURBED_POINT_CLOUD_FOLDER = WORK_DIR / "perlin_point_clouds_perturbed"
 PER_REM_POINT_CLOUD_FOLDER = WORK_DIR / "perlin_point_clouds_per_rem"
 #Rotation and translation are applied in the same step (rigid_transforms.csv), the heatmaps split them afterwards.
 RIGID_POINT_CLOUD_FOLDER = WORK_DIR / "perlin_point_clouds_rigid"
+#Clean vs noisy dual clouds of the impulsive noise: <cloud>_n<count>s<offset>.csv
+NOISE_POINT_CLOUD_FOLDER = WORK_DIR / "perlin_point_clouds_noise"
 
 
 #############################
@@ -220,6 +231,36 @@ match SELECTED_DATASET_OPTION:
         #STEP 6 HEATMAP RUNNER
         HR__HEATMAP_CASES = ["per+rem"]
 
+    case DATASET_CONFIG_OPTIONS.IMPULSIVE_NOISE:
+
+        #STEP 1 GENERATION (not needed: step 2 builds the clean and the noisy cloud from the Perlin field)
+        PFG__DEFAULT_DATASET_CSV_FILE = PERLIN_BASE_CSV_DATASET_DIR / "perlin_base_dataset.csv"
+        PFG__DEFAULT_BASE_POINT_CLOUD_FOLDER = BASE_POINT_CLOUD_FOLDER
+
+        #STEP 2 TRANSFORMATION/CROSS (in this case: impulsive noise, generate_noise_perlin_files.py)
+        GCPF__DEFAULT_BASE_POINT_CLOUD_FOLDER = None
+        GCPF__OUTPUT_FOLDER = None
+        GTPF__DEFAULT_BASE_POINT_CLOUD_FOLDER = None
+        GTPF__DESTINATION_TRANSFORMED_POINT_CLOUD_FOLDER = None
+        GTPF__OPTION = None
+
+        #Point sets used by the steps 3 to 6
+        POINT_CLOUD_FOLDER = NOISE_POINT_CLOUD_FOLDER
+
+        #STEP 4 NNDistances Plots
+        NND__CURRENT_CASE_IDX = 6
+
+        #STEP 5 MCI COMMANDS HELPER
+        MCIHELP__SET_TYPE = "Impulsive_Noise"
+        MCIHELP__OUTPUT_FOLDER = WORK_DIR / "MCI"
+
+        #STEP 6 HEATMAP RUNNER (bars per cloud, mean of the noise variations)
+        HR__HEATMAP_CASES = ["noise"]
+
+#STEP 2 IMPULSIVE NOISE (generate_noise_perlin_files.py)
+GNPF__DATASET_CSV_FILE = PERLIN_BASE_CSV_DATASET_DIR / "perlin_base_dataset.csv"
+GNPF__OUTPUT_FOLDER = NOISE_POINT_CLOUD_FOLDER
+
 
 #STEP 3 PREVIEWS
 GP__PREVIEW_INPUT = POINT_CLOUD_FOLDER
@@ -236,6 +277,7 @@ NND__TRANSFORMED_POINT_CLOUD_FOLDER_NAMES__CASE__PERTURBED = PERTURBED_POINT_CLO
 NND__TRANSFORMED_POINT_CLOUD_FOLDER_NAMES__CASE__PER_REM = PER_REM_POINT_CLOUD_FOLDER
 NND__TRANSFORMED_POINT_CLOUD_FOLDER_NAMES__CASE__ROTATION = RIGID_POINT_CLOUD_FOLDER
 NND__TRANSFORMED_POINT_CLOUD_FOLDER_NAMES__CASE__TRANSLATION = RIGID_POINT_CLOUD_FOLDER
+NND__TRANSFORMED_POINT_CLOUD_FOLDER_NAMES__CASE__NOISE = NOISE_POINT_CLOUD_FOLDER
 
 #STEP 5 MCI COMMANDS HELPER
 #Arguments for mci_lib/processes/mci_process.py: the point sets folder and the folder where the MCI files are written.
@@ -267,6 +309,7 @@ match PIPELINE_OPTIONS:
             case 3: NND__TRANSFORMED_POINT_CLOUD_FOLDER_NAMES__CASE__PER_REM = POINT_CLOUD_FOLDER
             case 4: NND__TRANSFORMED_POINT_CLOUD_FOLDER_NAMES__CASE__ROTATION = POINT_CLOUD_FOLDER
             case 5: NND__TRANSFORMED_POINT_CLOUD_FOLDER_NAMES__CASE__TRANSLATION = POINT_CLOUD_FOLDER
+            case 6: NND__TRANSFORMED_POINT_CLOUD_FOLDER_NAMES__CASE__NOISE = POINT_CLOUD_FOLDER
 
         MCIHELP__POINT_CLOUD_FOLDER = POINT_CLOUD_FOLDER
 
@@ -348,7 +391,7 @@ match PIPELINE_OPTIONS:
         NND__TRANSFORMED_POINT_CLOUD_FOLDER_NAMES__CASE__ROTATION = GTPF__DESTINATION_TRANSFORMED_POINT_CLOUD_FOLDER
         NND__TRANSFORMED_POINT_CLOUD_FOLDER_NAMES__CASE__TRANSLATION = GTPF__DESTINATION_TRANSFORMED_POINT_CLOUD_FOLDER
 
-        # Case index: 0 Base, 1 Removal, 2 Perturbed, 3 Perturbed+Removal, 4 Rotation, 5 Translation
+        # Case index: 0 Base, 1 Removal, 2 Perturbed, 3 Perturbed+Removal, 4 Rotation, 5 Translation, 6 Impulsive noise
         NND__CURRENT_CASE_IDX = 4
 
 

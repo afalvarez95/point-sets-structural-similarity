@@ -9,9 +9,15 @@ matplotlib.use('TkAgg')
 from config import HR__HEATMAP_CASES, HR__MCI_FOLDERS, HR__OUTPUT_FOLDER
 
 for option in HR__HEATMAP_CASES:
-    #The maximum radius recommended by the NNDistances step is the P95 of the 2NN distances.
-    suboption = "2nn"
-    suboption_title = f"{suboption.upper()}"
+    #Impulsive noise: no heatmaps, one bar plot of every measurement (mean of the seed variations)
+    if option == "noise":
+        BARS_SCRIPT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "generate_bars_noise.py")
+        subprocess.run(
+        [sys.executable, BARS_SCRIPT, str(HR__MCI_FOLDERS[option]), os.path.join(HR__OUTPUT_FOLDER, option),
+         "--title", "Clean vs impulsive noise Perlin Point Sets"],
+        encoding="cp1252"
+        )
+        continue
 
     HAS_TYPES = option == "rigid"
 
@@ -34,7 +40,7 @@ for option in HR__HEATMAP_CASES:
 
     MEASUREMENTS = ["mci","avg_haussdorf_distance_value","p95_haussdorf_distance_value","haussdorf_distance_value","wasserstein"]
 
-    MEASUREMENTS_TITLES = [f"MCI using P95 Max {suboption_title}","Avg Haussdorf Distance","P95 Haussdorf Distance","Haussdorf Distance","Sliced Wasserstein Distance"]
+    MEASUREMENTS_TITLES = ["MCI","AHD","HD95","Hausdorff","Sliced Wasserstein"]
 
     OUTPUT_FOLDER = os.path.join(HR__OUTPUT_FOLDER, option)
 
@@ -49,7 +55,7 @@ for option in HR__HEATMAP_CASES:
 
     if not HAS_TYPES:
         for m,mt in zip(MEASUREMENTS,MEASUREMENTS_TITLES):
-            formatted_title = f"{initial_titles[option]} {mt} Heatmap"
+            formatted_title = f"{initial_titles[option]} {mt}"
             print(MCI_SCRIPT, MCI_FOLDER ,f"\"{m}\"", f"\"{mt}\"", REVERSE)
 
             subprocess.run(
@@ -60,10 +66,18 @@ for option in HR__HEATMAP_CASES:
         for type_ in TYPES:
             for m,mt in zip(MEASUREMENTS,MEASUREMENTS_TITLES):
                 print("IN TYPES")
-                formatted_title = f"{initial_titles[option]} - {TYPES_NAMES[type_]} - {mt} Heatmap"
+                formatted_title = f"{initial_titles[option]} - {TYPES_NAMES[type_]} - {mt}"
                 print(MCI_SCRIPT, MCI_FOLDER ,f"\"{m}\"", f"\"{mt}\"", type_, OUTPUT_FOLDER, REVERSE)
 
                 subprocess.run(
                 [sys.executable, MCI_SCRIPT, MCI_FOLDER ,m, formatted_title, f"{type_}", OUTPUT_FOLDER, REVERSE],
                 encoding="cp1252"
                 )
+
+    #Perturbation + removal also gets the violin and bar grids (epsilon vs % of removal) of every measurement
+    if option == "per+rem":
+        GRID_SCRIPT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "generate_grid_rem_and_pert.py")
+        subprocess.run(
+        [sys.executable, GRID_SCRIPT, MCI_FOLDER, os.path.join(OUTPUT_FOLDER, "grids"), "--title", initial_titles[option]],
+        encoding="cp1252"
+        )
