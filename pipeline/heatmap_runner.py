@@ -81,3 +81,9 @@ for option in HR__HEATMAP_CASES:
         [sys.executable, GRID_SCRIPT, MCI_FOLDER, os.path.join(OUTPUT_FOLDER, "grids"), "--title", initial_titles[option]],
         encoding="cp1252"
         )
+        #And the compact plot (removal 0, 20 and 60%), made from the _matrix.csv files of the heatmaps above
+        COMPACT_SCRIPT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "generate_compact_rem_and_pert.py")
+        subprocess.run(
+        [sys.executable, COMPACT_SCRIPT, OUTPUT_FOLDER, os.path.join(OUTPUT_FOLDER, "compact"), "--title", initial_titles[option]],
+        encoding="cp1252"
+        )
