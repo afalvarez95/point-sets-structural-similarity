@@ -132,16 +132,6 @@ The citation is also in [CITATION.cff](CITATION.cff) (the *Cite this repository*
 - Code: [MIT](LICENSE).
 - Datasets (`input_datasets/`, `perlin_base_csv_dataset/`), figures (`results/`, `sample_results/`, and the text and figures of the notebook) and documentation: [CC BY 4.0](LICENSE-DATA).
 
-## Author contributions
-
-Roles following the [CRediT taxonomy](https://credit.niso.org/).
-
-- **Ángel Franco-Álvarez**: software (code of this repository), data curation (generation of the datasets).
-- **Nicolò Zava**: {{ROLES}}.
-- **Samy Blusseau**: {{ROLES}}.
-- **Santiago Velasco-Forero**: {{ROLES}}.
-- **Maria-Jose Jimenez**: {{ROLES}}.
-
 ## Acknowledgements
 
 This research was partially funded by the French National Research Agency (ANR) under the France 2030 program, grant PR[AI]RIE-PSAI (ANR-23-IACL-0008). 
