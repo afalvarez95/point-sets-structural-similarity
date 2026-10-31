@@ -1,6 +1,19 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "mci_lib"
 version = "0.1.0"
+description = "Multiscale Closing Index (MCI) for measuring structural similarity between 2D point sets"
+authors = [{ name = "Ángel Franco-Álvarez" }]
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.12"
+
+[project.urls]
+Repository = "https://github.com/afalvarez95/point-sets-structural-similarity"
+Paper = "PAPER DOI PENDING"
 
 [tool.setuptools.packages.find]
 include = ["mci_lib*"]
