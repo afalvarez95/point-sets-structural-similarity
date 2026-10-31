@@ -17,9 +17,16 @@ def list_first_level_folders(folder_path):
         return []
 
 
+def dual_cloud_folder(selected_folder, base_folder_input):
+    #<selected>/<dual cloud>/: the dual cloud folder has the same name in the pipeline runs, but not in sample_results
+    folder = os.path.join(base_folder_input, selected_folder)
+    inner = list_first_level_folders(folder)
+    return os.path.join(folder, selected_folder if selected_folder in inner else inner[0])
+
+
 def change_frames_folder(selected_folder, base_folder_input):
     global image_files, image_folder, current_index
-    image_folder = os.path.join(base_folder_input, selected_folder, selected_folder, "frames")
+    image_folder = os.path.join(dual_cloud_folder(selected_folder, base_folder_input), "frames")
     image_files = [f for f in os.listdir(image_folder) if f.lower().endswith('.png')]
     image_files = sorted(image_files, key = lambda x: int(x.split('_')[1].split('.')[0]))
     current_index = 0
@@ -45,7 +52,7 @@ def prev_image():
     return get_image_at_index(current_index)
 
 def get_video_file(selected_folder,base_folder_input):
-    mp4_files = glob.glob(os.path.join(base_folder_input,selected_folder,selected_folder,'*.mp4'))
+    mp4_files = glob.glob(os.path.join(dual_cloud_folder(selected_folder,base_folder_input),'*.mp4'))
     if mp4_files:
         return mp4_files[0]
     else:
@@ -58,13 +65,13 @@ def get_measurements(selected_folder,base_folder_input):
     return tuple(measurements_df.loc[0, ['mci', 'wasserstein', 'avg_haussdorf_distance_value','p95_haussdorf_distance_value','haussdorf_distance_value']])
 
 def get_jd_per_radius_plot(selected_folder,base_folder_input):
-    return os.path.join(base_folder_input,selected_folder,selected_folder,selected_folder+'_jd_per_r_plot.png')
+    return glob.glob(os.path.join(dual_cloud_folder(selected_folder,base_folder_input),'*_jd_per_r_plot.png'))[0]
 
 
 with gr.Blocks(fill_height=True,fill_width=True) as demo:
     with gr.Row():
         with gr.Column():
-            default_folder = Path(__file__).parent.parent / "MCI_experiments"
+            default_folder = Path(__file__).parent.parent / "sample_results"
             with gr.Row():
                 base_folder_input = gr.Textbox(label="Enter folder path of the data...", value=default_folder)
             list_button = gr.Button("List Subfolders")
@@ -105,4 +112,5 @@ with gr.Blocks(fill_height=True,fill_width=True) as demo:
         prev_button.click(prev_image, inputs=[], outputs=frame_image_slideshow)
         next_button.click(next_image, inputs=[], outputs=frame_image_slideshow)
 
-demo.launch(server_port=7860,share=False)
+#The frames, plots and videos are served from the project folder (sample_results/, runs/)
+demo.launch(server_port=7860,share=False,allowed_paths=[str(Path(__file__).parent.parent)])
