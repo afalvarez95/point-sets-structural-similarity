@@ -1,0 +1,40 @@
+cff-version: 1.2.0
+message: "If you use this code or the datasets, please cite the paper below."
+type: software
+title: "Multiscale Closing Index: Code and datasets of the paper"
+version: 0.1.0
+license:
+  - MIT
+  - CC-BY-4.0
+repository-code: "https://github.com/afalvarez95/point-sets-structural-similarity"
+keywords:
+  - point sets
+  - morphological closing
+authors:
+  - family-names: "Franco-Álvarez"
+    given-names: "Ángel"
+    affiliation: "Universidad de Sevilla"
+preferred-citation:
+  type: article
+  title: "Multiscale Closing Index (MCI) for measuring structural similarity between 2D point sets"
+  authors:
+    - family-names: "Zava"
+      given-names: "Nicolò"
+      affiliation: "Institute of Science and Technology Austria (ISTA)"
+    - family-names: "Franco-Álvarez"
+      given-names: "Ángel"
+      affiliation: "Universidad de Sevilla"
+    - family-names: "Blusseau"
+      given-names: "Samy"
+      affiliation: "Mines Paris, PSL University, Centre for Statistics and Images (STIM), Fontainebleau, France"
+    - family-names: "Velasco-Forero"
+      given-names: "Santiago"
+      affiliation: "Mines Paris, PSL University, Centre for Statistics and Images (STIM), Fontainebleau, France"
+    - family-names: "Jimenez"
+      given-names: "Maria-Jose"
+      affiliation: "Universidad de Sevilla"
+  journal: "PENDING"
+  # To fill once the paper is on arXiv:
+  # year: 2026
+  # doi: "10.48550/arXiv.XXXX.XXXXX"
+  # url: "https://arxiv.org/abs/XXXX.XXXXX"
