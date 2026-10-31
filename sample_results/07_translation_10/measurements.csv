@@ -1,0 +1,2 @@
+seed,translation,rotation,avg_haussdorf_distance_value,p95_haussdorf_distance_value,haussdorf_distance_value,wasserstein,mci,jd_r
+B4816-1-A,"T(10.0,0.0)",R0.0_center,6.882294274597655,10.0,10.0,7.03540866543805,0.4757156715863178,"(8,0.9329761513309456);(12,0.6766033563257277);(16,0.3803724437822519);(20,0.2687552983767384);(24,0.2212870243901609)"
