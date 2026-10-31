@@ -1,0 +1,34 @@
+Datasets, figures and documentation of this repository
+
+Copyright (c) 2026 Ángel Franco-Álvarez
+
+The following files are licensed under the Creative Commons Attribution 4.0
+International License (CC BY 4.0):
+
+  input_datasets/            point sets used by the partial tests and the paper
+  perlin_base_csv_dataset/   descriptions of how the point sets are generated
+  results/                   heatmaps, grids, bars and compact plots of the paper
+                             results, and their matrices
+  sample_results/            complete MCI output (measurements, videos, plots
+                             and frames) of 10 dual clouds
+  notebook/                  the text and figures of mci_custom_clouds.ipynb
+                             (its code cells are MIT) and notebook/README.md
+  README.md, INSTRUCTIONS.md the documentation of the repository
+
+The code of the repository (every other file, and the code cells of the
+notebook) is licensed under the MIT License, see LICENSE.
+
+You are free to share and adapt this material for any purpose, even
+commercially, as long as you give appropriate credit, provide a link to the
+license and indicate if changes were made. To give credit, cite:
+
+  N. Zava, Á. Franco-Álvarez, S. Blusseau, S. Velasco-Forero, M.-J. Jimenez.
+  Multiscale Closing Index (MCI) for measuring structural similarity between
+  2D point sets. Preprint, 2026.
+  https://github.com/afalvarez95/point-sets-structural-similarity
+
+Full legal code of the license:
+https://creativecommons.org/licenses/by/4.0/legalcode
+
+Summary of the license:
+https://creativecommons.org/licenses/by/4.0/
