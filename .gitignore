@@ -4,7 +4,9 @@ __pycache__/
 .venv/
 venv/
 
-
 # Pipeline working folder (generated outputs)
 runs/
+
+# Notebook outputs, each user generates their own
 notebook/outputs/
+.ipynb_checkpoints/
