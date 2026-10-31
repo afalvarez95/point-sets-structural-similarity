@@ -1,4 +1,4 @@
-(Python 3.12.10) for reproducibility.
+# Requires Python 3.12.10.
 # Install with: pip install -r requirements.txt, then pip install -e . for mci_lib.
 # The MCI videos also need ffmpeg installed and on the PATH (it is not a pip package).
 
