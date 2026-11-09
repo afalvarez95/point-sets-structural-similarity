@@ -1,6 +1,6 @@
 # Multiscale Closing Index (MCI) for measuring structural similarity between 2D point sets
 
-[![Paper](https://img.shields.io/badge/paper-pending-orange.svg)]({{PAPER_URL}})
+[![arXiv](https://img.shields.io/badge/arXiv-2611.09745-b31b1b.svg)](https://arxiv.org/abs/2611.09745)
 [![Code license: MIT](https://img.shields.io/badge/code%20license-MIT-blue.svg)](LICENSE)
 [![Data license: CC BY 4.0](https://img.shields.io/badge/data%20license-CC%20BY%204.0-lightgrey.svg)](LICENSE-DATA)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](requirements.txt)
@@ -11,7 +11,7 @@ Nicolò Zava<sup>1</sup>, Ángel Franco-Álvarez<sup>2</sup>, Samy Blusseau<sup>
 <sup>2</sup> Universidad de Sevilla<br>
 <sup>3</sup> Mines Paris, PSL University, Centre for Statistics and Images (STIM), Fontainebleau, France
 
-{{VENUE}}, 2026
+arXiv preprint arXiv:2611.09745, 2026
 
 Code and datasets accompanying the paper. The MCI (Multiscale Closing Index) compares two point sets through their morphological closings over a range of radii: for each radius $r$ it measures how much the closings of the two sets differ ($J_\delta$). It ranges from 0 (same point sets) to 1.
 
@@ -116,12 +116,14 @@ Then open http://127.0.0.1:7860. It starts on `sample_results/`: pick a case in 
 If you use this code or the datasets, please cite:
 
 ```bibtex
-@article{zava2026mci,
-  title   = {Multiscale Closing Index (MCI) for measuring structural similarity between 2D point sets},
-  author  = {Zava, Nicol{\`o} and Franco-{\'A}lvarez, {\'A}ngel and Blusseau, Samy and Velasco-Forero, Santiago and Jimenez, Maria-Jose},
-  journal = { {{VENUE}} },
-  year    = { {{YEAR}} },
-  doi     = { {{PAPER DOI}} }
+@misc{zava2026multiscaleclosingindexmci,
+      title={Multiscale Closing Index (MCI) for measuring structural similarity between 2D point sets}, 
+      author={Nicolò Zava and Angel Franco-Alvarez and Samy Blusseau and Santiago Velasco-Forero and Maria-Jose Jimenez},
+      year={2026},
+      eprint={2611.09745},
+      archivePrefix={arXiv},
+      primaryClass={math.MG},
+      url={https://arxiv.org/abs/2611.09745}, 
 }
 ```
 
