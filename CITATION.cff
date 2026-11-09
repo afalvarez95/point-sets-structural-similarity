@@ -34,7 +34,6 @@ preferred-citation:
       given-names: "Maria-Jose"
       affiliation: "Universidad de Sevilla"
   journal: "PENDING"
-  # To fill once the paper is on arXiv:
-  # year: 2026
-  # doi: "10.48550/arXiv.XXXX.XXXXX"
-  # url: "https://arxiv.org/abs/XXXX.XXXXX"
+  year: 2026
+  doi: "10.48550/arXiv.2611.09745"
+  url: "https://arxiv.org/abs/2611.09745"
